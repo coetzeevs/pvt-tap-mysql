@@ -14,7 +14,6 @@ SAMPLE_CONFIG = {
         "port": 2223,
         "username": "melty",
         "private_key": "",
-        "ssh_proxy_enabled": False,
     },
 }
 
