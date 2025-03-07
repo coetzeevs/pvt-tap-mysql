@@ -32,7 +32,9 @@ jobs:
       uses: actions/checkout@v4.1.1
 
     - name: Set Compose Project Name
-      run: echo "COMPOSE_PROJECT_NAME=tap-mysql-test-${{ matrix.python-version }}-${{ github.run_id }}" >> $GITHUB_ENV
+      run: |
+        PYTHON_VERSION=$(echo "${{ matrix.python-version }}" | tr '.' '-')
+        echo "COMPOSE_PROJECT_NAME=tap-mysql-test-${PYTHON_VERSION}-${{ github.run_id }}" >> $GITHUB_ENV
 
     - name: Run docker compose
       uses: hoverkraft-tech/compose-action@v2.0.1
