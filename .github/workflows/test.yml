@@ -31,9 +31,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4.1.1
 
-    - name: Set up MySQL containers (SSH Included)
-      run: |
-        docker compose -f docker-compose.yml up -d
+    - name: Run docker compose
+      uses: hoverkraft-tech/compose-action@v2.0.1
+      with:
+        compose-file: "./docker-compose.yml"
+        compose-project-name: "tap-mysql-test-${{ matrix.python-version }}-${{ github.run_id }}"
 
     - name: Wait for MySQL to be ready
       run: |
@@ -44,6 +46,8 @@ jobs:
     - name: Install Poetry
       run: |
         pipx install poetry
+        pipx ensurepath
+        source ~/.profile
         poetry --version
 
     - name: Set up Python ${{ matrix.python-version }}
@@ -57,9 +61,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/pypoetry
-        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
         restore-keys: |
-          ${{ runner.os }}-poetry-
+          ${{ runner.os }}-poetry-${{ matrix.python-version }}-
 
     - name: Install dependencies
       run: |

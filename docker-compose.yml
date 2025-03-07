@@ -38,14 +38,6 @@ services:
       - "127.0.0.1:2223:2222"
     networks:
       - inner
-    entrypoint:
-      - /bin/bash
-      - -c
-      - |
-        chmod 600 /config/ssh_host_keys/ssh_host_*_key
-        chmod 644 /config/ssh_host_keys/ssh_host_*_key.pub
-        /usr/sbin/sshd -D -e
-
 networks:
   inner:
     driver: bridge
