@@ -31,11 +31,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4.1.1
 
+    - name: Set Compose Project Name
+      run: echo "COMPOSE_PROJECT_NAME=tap-mysql-test-${{ matrix.python-version }}-${{ github.run_id }}" >> $GITHUB_ENV
+
     - name: Run docker compose
       uses: hoverkraft-tech/compose-action@v2.0.1
       with:
         compose-file: "./docker-compose.yml"
-        compose-project-name: "tap-mysql-test-${{ matrix.python-version }}-${{ github.run_id }}"
 
     - name: Wait for MySQL to be ready
       run: |

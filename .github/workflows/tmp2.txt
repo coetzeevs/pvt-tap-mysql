@@ -1,0 +1,79 @@
+Run poetry run pytest
+  poetry run pytest
+  shell: /usr/bin/bash -e {0}
+  env:
+    pythonLocation: /opt/hostedtoolcache/Python/3.10.16/x64
+    PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.10.16/x64/lib/pkgconfig
+    Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.16/x64
+    Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.16/x64
+    Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.10.16/x64
+    LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.10.16/x64/lib
+  
+============================= test session starts ==============================
+platform linux -- Python 3.10.16, pytest-8.3.4, pluggy-1.5.0
+rootdir: /home/runner/work/pvt-tap-mysql/pvt-tap-mysql
+configfile: pyproject.toml
+plugins: Faker-35.2.0, singer-sdk-0.44.3
+collected 50 items
+
+tests/test_core.py ..................................                    [ 68%]
+tests/test_selected_columns_only.py ...............                      [ 98%]
+tests/test_ssh_tunnel.py F                                               [100%]
+
+=================================== FAILURES ===================================
+_______________________________ test_ssh_tunnel ________________________________
+
+    def test_ssh_tunnel() -> None:
+        """We expect the SSH environment to already be up."""
+        private_key = Path("ssh_tunnel/ssh-server-config/ssh_host_rsa_key").read_text()
+        SAMPLE_CONFIG["ssh_tunnel"]["private_key"] = private_key
+>       tap = TapMySQL(config=SAMPLE_CONFIG)
+
+tests/test_ssh_tunnel.py:24: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tap_mysql/tap.py:41: in __init__
+    super().__init__(*args, **kwargs)
+../../../.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/singer_sdk/tap_base.py:676: in __init__
+    super().__init__(*args, **kwargs)
+../../../.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/singer_sdk/tap_base.py:118: in __init__
+    self.setup_mapper()
+../../../.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/singer_sdk/tap_base.py:194: in setup_mapper
+    self.mapper.register_raw_streams_from_catalog(self.catalog)
+../../../.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/singer_sdk/tap_base.py:187: in catalog
+    self._catalog = self.input_catalog or self._singer_catalog
+../../../.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/singer_sdk/tap_base.py:340: in _singer_catalog
+    for stream in self.streams.values()
+../../../.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/singer_sdk/tap_base.py:149: in streams
+    for stream in self.load_streams():
+../../../.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/singer_sdk/tap_base.py:373: in load_streams
+    for stream in self.discover_streams():
+tap_mysql/tap.py:340: in discover_streams
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   | EOFError
+2025-03-07 16:46:07,990| ERROR   | 
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   | 
+2025-03-07 16:46:07,990| ERROR   | During handling of the above exception, another exception occurred:
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   | During handling of the above exception, another exception occurred:
+2025-03-07 16:46:07,990| ERROR   | 
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   | 
+2025-03-07 16:46:07,990| ERROR   | Traceback (most recent call last):
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   | Traceback (most recent call last):
+2025-03-07 16:46:07,990| ERROR   |   File "/home/runner/.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/paramiko/transport.py", line 2185, in run
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   |   File "/home/runner/.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/paramiko/transport.py", line 2185, in run
+2025-03-07 16:46:07,990| ERROR   |     self._check_banner()
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   |     self._check_banner()
+2025-03-07 16:46:07,990| ERROR   |   File "/home/runner/.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/paramiko/transport.py", line 2373, in _check_banner
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   |   File "/home/runner/.cache/pypoetry/virtualenvs/meltanolabs-tap-mysql-ULeCp6SI-py3.10/lib/python3.10/site-packages/paramiko/transport.py", line 2373, in _check_banner
+2025-03-07 16:46:07,990| ERROR   |     raise SSHException(
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   |     raise SSHException(
+2025-03-07 16:46:07,990| ERROR   | paramiko.ssh_exception.SSHException: Error reading SSH protocol banner
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   | paramiko.ssh_exception.SSHException: Error reading SSH protocol banner
+2025-03-07 16:46:07,990| ERROR   | 
+2025-03-07 16:46:07,990 | ERROR    | paramiko.transport   | 
+2025-03-07 16:46:07,990| ERROR   | Could not connect to gateway 127.0.0.1:2223 : Error reading SSH protocol banner
+2025-03-07 16:46:07,990 | ERROR    | sshtunnel.SSHTunnelForwarder | Could not connect to gateway 127.0.0.1:2223 : Error reading SSH protocol banner
+------------------------------ Captured log call -------------------------------
+INFO     tap-mysql:plugin_base.py:200 Skipping parse of env var settings...
+=========================== short test summary info ============================
+FAILED tests/test_ssh_tunnel.py::test_ssh_tunnel - sshtunnel.BaseSSHTunnelForwarderError: Could not establish session to SSH gateway
+========================= 1 failed, 49 passed in 5.64s =========================
+Error: Process completed with exit code 1.
