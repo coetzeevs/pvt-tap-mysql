@@ -283,18 +283,27 @@ class TapMySQL(SQLTap):
             remote_bind_address=(url.host, url.port),
             ssh_proxy_enabled=ssh_config.get("ssh_proxy_enabled", True),
         )
-        self.ssh_tunnel.start()
 
-        if not self.ssh_tunnel.is_active:
-            # retry and use graceful backoff
-            self.logger.warning("SSH Tunnel is not active, retrying...")
+        try:
+            self.ssh_tunnel.start()
+            if not self.ssh_tunnel.is_active:
+                raise RuntimeError("Initial SSH tunnel start failed.")  # Force entry to except block
+        except (RuntimeError, Exception) as e:  # Catch the forced error AND other potential exceptions
+            self.logger.warning(f"SSH Tunnel start failed: {e}, retrying...")
             counter = 0
             while counter < 5:
-                self.ssh_tunnel.start()
-                if self.ssh_tunnel.is_active:
-                    break
+                try:
+                    self.ssh_tunnel.start()
+                    if self.ssh_tunnel.is_active:
+                        self.logger.info("SSH Tunnel established after retry.")
+                        break  # Exit retry loop on success
+                except Exception as inner_e:
+                    self.logger.warning(f"Retry attempt {counter+1} failed: {inner_e}")
                 counter += 1
                 time.sleep(counter**2)
+            else:  # 'else' for the 'while' loop - executed if no 'break' occurred
+                self.logger.error("SSH Tunnel failed to start after multiple retries.")
+                raise  # Re-raise to signal failure to the caller
 
         self.logger.info("SSH Tunnel started")
         # On program exit clean up, want to also catch signals
