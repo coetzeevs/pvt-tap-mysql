@@ -1,0 +1,68 @@
+name: Test tap-myqsql
+
+on:
+  push:
+    branches: [main]
+    paths:
+    - tap_mysql/**
+    - tests/**
+    - poetry.lock
+    - pyproject.toml
+    - .github/workflows/test.yml
+  pull_request:
+    branches: [main]
+    paths:
+    - tap_mysql/**
+    - tests/**
+    - poetry.lock
+    - pyproject.toml
+    - .github/workflows/test.yml
+  workflow_dispatch:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    env:
+      PIP_CONSTRAINT: ./.github/workflows/constraints.txt
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4.1.1
+
+    - name: Set up MySQL containers (SSH Included)
+      run: |
+        docker compose -f docker-compose.yml up -d
+
+    - name: Wait for MySQL to be ready
+      run: |
+        wget -O wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
+        chmod +x wait-for-it.sh
+        ./wait-for-it.sh -t 30 127.0.0.1:3306 -- echo "MySQL is ready"
+
+    - name: Set up Python ${{ matrix.python-version }}
+      id: setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Upgrade pip
+      run: |
+        pip install --upgrade pip
+        pip --version
+    - name: Install Poetry
+      run: |
+        pip install poetry
+        poetry --version
+    - name: Install dependencies
+      run: |
+        poetry install --no-interaction --no-root
+    - name: Run pytest
+      run: |
+        poetry run pytest
+    - name: Run lint
+      run: |
+        poetry run tox -e typing
