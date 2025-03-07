@@ -4,8 +4,6 @@ from pathlib import Path
 
 from tap_mysql.tap import TapMySQL
 
-import logging
-import paramiko
 
 TABLE_NAME = "test_replication_key"
 SAMPLE_CONFIG = {
@@ -16,17 +14,13 @@ SAMPLE_CONFIG = {
         "port": 2223,
         "username": "melty",
         "private_key": "",
+        "ssh_proxy_enabled": False,
     },
 }
 
 
 def test_ssh_tunnel() -> None:
     """We expect the SSH environment to already be up."""
-    # Configure paramiko logging
-    paramiko.util.log_to_file("paramiko.log")
-    logging.basicConfig(level=logging.DEBUG)
-    paramiko_logger = logging.getLogger("paramiko")
-    paramiko_logger.setLevel(logging.DEBUG)
 
     private_key = Path("ssh_tunnel/ssh-server-config/ssh_host_rsa_key").read_text()
     SAMPLE_CONFIG["ssh_tunnel"]["private_key"] = private_key

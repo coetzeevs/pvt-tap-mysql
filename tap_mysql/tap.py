@@ -7,6 +7,7 @@ import io
 import signal
 import sys
 from functools import cached_property
+import time
 from typing import TYPE_CHECKING, Any, cast
 
 import paramiko
@@ -280,8 +281,21 @@ class TapMySQL(SQLTap):
             ssh_pkey=self.guess_key_type(ssh_config["private_key"]),
             ssh_private_key_password=ssh_config.get("private_key_password"),
             remote_bind_address=(url.host, url.port),
+            ssh_proxy_enabled=ssh_config.get("ssh_proxy_enabled", True),
         )
         self.ssh_tunnel.start()
+
+        if not self.ssh_tunnel.is_active:
+            # retry and use graceful backoff
+            self.logger.warning("SSH Tunnel is not active, retrying...")
+            counter = 0
+            while counter < 5:
+                self.ssh_tunnel.start()
+                if self.ssh_tunnel.is_active:
+                    break
+                counter += 1
+                time.sleep(counter**2)
+
         self.logger.info("SSH Tunnel started")
         # On program exit clean up, want to also catch signals
         atexit.register(self.clean_up)
